@@ -84,9 +84,9 @@ Na końcu każdego filaru: krótkie jakościowe podsumowanie — co mocne, co bu
 
 ## Output
 
-Save session results to `AI design/Analizy/[Company]/notes.md`.
-Update `AI design/Analizy/[Company]/CLAUDE.md` (max 15 lines): phase, Lynch label, current filar, key decisions so far.
+Save session results to `[your-folder]/Analizy/[Company]/notes.md`.
+Update `[your-folder]/Analizy/[Company]/CLAUDE.md` (max 15 lines): phase, Lynch label, current filar, key decisions so far.
 
 ## Sector playbooks
 
-Check `AI design/Analizy/Playbooks/[sector].md` at start. If missing: research sector KPIs → show user → await approval → seed playbook.
+Check `[your-folder]/Analizy/Playbooks/[sector].md` at start. If missing: research sector KPIs → show user → await approval → seed playbook.
