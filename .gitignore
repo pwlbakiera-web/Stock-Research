@@ -1,0 +1,6 @@
+# Analizy konkretnych spółek — nie wrzucamy
+Analizy/*/
+
+# System
+.DS_Store
+Thumbs.db
