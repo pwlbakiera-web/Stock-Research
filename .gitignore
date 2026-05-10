@@ -1,6 +1,9 @@
 # Per-company analyses — keep out of version control
 Analyses/*/
 
+# Local sync script
+sync-skill.ps1
+
 # System
 .DS_Store
 Thumbs.db
