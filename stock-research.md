@@ -96,6 +96,5 @@ uv run python main.py llm=gemini agent=no_e2b
 - task_description line: ~32 in main.py
 - LLM: gemini-3-flash-preview
 - Agent config: no_e2b (Google Search + Jina, no code sandbox)
-- Cost: ~$0.05–0.10 per question
 - Time: 3–6 minutes
 
