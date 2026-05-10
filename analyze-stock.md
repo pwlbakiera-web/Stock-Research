@@ -12,10 +12,13 @@ Structured 8-step investment analysis. User drives pace — work in small steps,
 ## Invocation
 
 ```
-/analyze-stock [Company]
+/analyze-stock [Company]           ← new analysis or continue existing
+/analyze-stock [Company] update    ← earnings update / thesis review
 ```
 
-If company folder exists at `[your-folder]/Analizy/[Company]/`, read `CLAUDE.md` first to see current state and continue from where we left off. Otherwise start from Step 0.
+**New analysis / continue:** If company folder exists, read `CLAUDE.md` first to see current state and continue from where we left off. Otherwise start from Step 0.
+
+**Update mode:** Triggered by `update` argument or when user says "update [Company]", "new results", "aktualizujemy". See Update Mode section below.
 
 ## Structure
 
@@ -83,9 +86,39 @@ At the end of each pillar: short qualitative summary — what's strong, what rai
 
 ## Output
 
-Save session results to `[your-folder]/Analizy/[Company]/notes.md`.
-Update `[your-folder]/Analizy/[Company]/CLAUDE.md` (max 15 lines): phase, Lynch label, current pillar, key decisions so far.
+Save session results to `[your-folder]/Analyses/[Company]/notes.md`.
+Update `[your-folder]/Analyses/[Company]/CLAUDE.md` (max 15 lines): phase, Lynch label, current pillar, key decisions so far.
 
 ## Sector playbooks
 
-Check `[your-folder]/Analizy/Playbooks/[sector].md` at start. If missing: research sector KPIs → show user → await approval → seed playbook.
+Check `[your-folder]/Analyses/Playbooks/[sector].md` at start. If missing: research sector KPIs → show user → await approval → seed playbook.
+
+## Update Mode
+
+Triggered when user says "update [Company]", "new results", "aktualizujemy", or invokes `/analyze-stock [Company] update`.
+
+**Step 1 — Load context**
+Read `Analyses/[Company]/CLAUDE.md` and `notes.md`. Briefly summarize: current phase, Lynch label, original investment thesis, last valuation.
+
+**Step 2 — Ask what's new**
+"What are we updating?" — user provides:
+- New financial data (fiscal.ai)
+- New earnings call transcript (NotebookLM)
+- Specific news or events
+
+**Step 3 — Review affected pillars only**
+Focus on what changed, skip what didn't:
+- New financials → Pillar 4 (Financial Analysis)
+- New guidance / earnings call → Pillar 6 (Outlook)
+- Both → Pillar 7 (Valuation update)
+- New competitive event → Pillar 3 (Execution Risk)
+- Optionally trigger /stock-research for external verification
+
+**Step 4 — Thesis verdict**
+Does the original investment case still hold?
+- **Confirmed** — results in line with or better than thesis assumptions
+- **Weakened** — one or more key assumptions deteriorated
+- **Broken** — thesis no longer valid, exit case to consider
+
+**Step 5 — Update files**
+Append new findings to `notes.md` with date. Update `CLAUDE.md` with new phase/valuation if changed.
