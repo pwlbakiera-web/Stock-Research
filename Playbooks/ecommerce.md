@@ -1,49 +1,49 @@
 # E-commerce Playbook
 
-*Źródła: Drew Cohen (Consumer Hierarchy of Preferences), analiza Shopee/TikTok Shop*
+*Sources: Drew Cohen (Consumer Hierarchy of Preferences), Shopee/TikTok Shop analysis*
 
-## Kluczowe metryki sektorowe
+## Key sector metrics
 
-- **GMV** (Gross Merchandise Value) — wolumen transakcji na platformie
-- **Take rate** — revenue jako % GMV; trend ważniejszy niż poziom
-- **Revenue growth vs GMV growth** — jeśli revenue rośnie szybciej niż GMV → take rate rośnie → monetyzacja się poprawia (dobry znak)
-- **Revenue growth vs Orders/Users growth** — jeśli revenue > orders/users → monetyzacja rośnie (dobry znak)
-- **Active buyers i sellers** — obie strony marketplace muszą rosnąć
-- **S&M jako % revenue** — spada lub stabilny → organiczny wzrost; rośnie → kupują wzrost
-- **Return rates** — TikTok Shop: 15-20% vs Shopee: 5-8%; wysoki zwrot = słaba jakość transakcji
-- **Adjusted EBITDA** — czy platforma zarabia bez subsydiów?
+- **GMV** (Gross Merchandise Value) — total transaction volume on the platform
+- **Take rate** — revenue as % of GMV; trend matters more than the level
+- **Revenue growth vs GMV growth** — if revenue grows faster than GMV → take rate is rising → monetization is improving (good sign)
+- **Revenue growth vs Orders/Users growth** — if revenue > orders/users → monetization is growing (good sign)
+- **Active buyers and sellers** — both sides of the marketplace must grow
+- **S&M as % of revenue** — falling or stable → organic growth; rising → buying growth
+- **Return rates** — TikTok Shop: 15-20% vs Shopee: 5-8%; high return rate = poor transaction quality
+- **Adjusted EBITDA** — is the platform profitable without subsidies?
 
 ## Drew Cohen — Consumer Hierarchy of Preferences
 
-Sygnały zdrowego e-commerce:
-- Revenue growth > User/Order growth → monetyzacja rośnie ✅
-- S&M jako % revenue spada lub stabilny → nie kupują wzrostu ✅
-- Brak kuponów i subsydiów dla istniejących klientów → silny value prop ✅
-- Istniejący klienci wracają bez zachęt → organic retention ✅
+Signals of healthy e-commerce:
+- Revenue growth > User/Order growth → monetization is growing ✅
+- S&M as % of revenue falling or stable → not buying growth ✅
+- No coupons or subsidies for existing customers → strong value prop ✅
+- Existing customers return without incentives → organic retention ✅
 
-Czerwone flagi:
-- Wzrost GMV bez wzrostu take rate → wolumen bez monetyzacji
-- S&M rośnie szybciej niż revenue → kupują wzrost, nie budują biznesu
-- Subsydia dla istniejących klientów → **Wish pattern** (uzależnienie od promocji, upadek gdy je zakończą)
-- Management unika pytań o unit economics per rynek
+Red flags:
+- GMV growth without take rate growth → volume without monetization
+- S&M growing faster than revenue → buying growth, not building a business
+- Subsidies for existing customers → **Wish pattern** (dependency on promotions, collapse when removed)
+- Management avoids questions about unit economics per market
 
-## Moat w e-commerce
+## Moat in e-commerce
 
-- **Network effect** — więcej sprzedawców → lepszy wybór → więcej kupujących → więcej sprzedawców
-- **Switching costs dla merchantów** — integracja z platformą, dane historyczne, wypracowane recenzje
-- **Geograficzna dominacja** — lider per kraj ma przewagę logistyczną i brand awareness; trudno atakować z zewnątrz
+- **Network effect** — more sellers → better selection → more buyers → more sellers
+- **Switching costs for merchants** — platform integration, historical data, accumulated reviews
+- **Geographic dominance** — market leader per country has logistics and brand advantage; hard to attack from outside
 
-## Ryzyka sektorowe
+## Sector risks
 
-- **Subsidy wars** — social commerce (TikTok Shop) finansowany przez ByteDance może subsydiować w nieskończoność; pytaj czy platforma może konkurować bez subsydiów
-- **Social commerce** — zakupy zintegrowane z contentem (TikTok, Instagram) — inna ścieżka zakupowa niż tradycyjny marketplace
-- **Regulacje** — szczególnie w emerging markets (Indonesia, Vietnam); zakazy TikTok Shop w niektórych krajach
-- **Country-specific dynamics** — udziały rynkowe bardzo różne per kraj; aggregate SEA może maskować utratę konkretnego rynku
+- **Subsidy wars** — social commerce (TikTok Shop) backed by ByteDance can subsidize indefinitely; ask whether the platform can compete without subsidies
+- **Social commerce** — shopping integrated with content (TikTok, Instagram) — a different purchase journey than traditional marketplace
+- **Regulation** — especially in emerging markets (Indonesia, Vietnam); TikTok Shop bans in some countries
+- **Country-specific dynamics** — market shares vary greatly per country; aggregate SEA figures can mask loss of a specific market
 
-## Pytania diagnostyczne
+## Diagnostic questions
 
-- Czy platforma jest profitable bez subsydiów?
-- Jaki % GMV pochodzi z rynków gdzie jest liderem vs followerem?
-- Czy take rate rośnie czy spada — i dlaczego?
-- Czy istniejący klienci wydają więcej rok do roku (spending per user trend)?
-- Czy wzrost użytkowników maskuje churn — czy nowi klienci zastępują odchodzących?
+- Is the platform profitable without subsidies?
+- What % of GMV comes from markets where it's the leader vs follower?
+- Is the take rate rising or falling — and why?
+- Are existing customers spending more year over year (spending per user trend)?
+- Is user growth masking churn — are new customers replacing those who left?

@@ -29,9 +29,9 @@ Not needed for: financial data (fiscal.ai), earnings call content (NotebookLM).
 
 Examples:
 ```
-/stock-research Sea Limited  czy Shopee faktycznie rośnie w Brazylii czy przegrywa z Mercado Libre?
-/stock-research Duolingo  co użytkownicy mówią o jakości nauki — czy naprawdę uczą się języka?
-/stock-research Sea Limited  jakie promocje i subsydia oferuje Shopee vs TikTok Shop w SEA?
+/stock-research Sea Limited  Is Shopee actually growing in Brazil or losing to Mercado Libre?
+/stock-research Duolingo  What do users say about learning quality — do they actually learn the language?
+/stock-research Sea Limited  What promotions and subsidies does Shopee offer vs TikTok Shop in SEA?
 ```
 
 ## Step-by-step
@@ -64,9 +64,9 @@ Structure your findings as:
 Be specific — for every data point include: the exact number, date, and the source as a markdown hyperlink using only the domain name as anchor text, e.g. [metric.vn](https://metric.vn/specific-article-path). The URL must point to the specific article or report page, NOT the homepage or domain root.
 ```
 
-3. **Pokaż prompt użytkownikowi** — przed uruchomieniem agenta zawsze zaprezentuj skonstruowany prompt z krótkim komentarzem (1-2 zdania) dlaczego tak go sformułowałeś. Czekaj na akceptację lub korektę. Dopiero po "ok" / "odpuść" idź dalej.
+3. **Show prompt to user** — before running the agent, always present the constructed prompt with a brief comment (1-2 sentences) explaining why you framed it that way. Wait for approval or corrections. Only proceed after "ok" / "go ahead".
 
-4. **Update main.py** — edit `C:\Users\pwlba\MiroThinker\apps\miroflow-agent\main.py`:
+4. **Update main.py** — edit `[your-path]/MiroThinker\apps\miroflow-agent\main.py`:
    - `task_id` → snake_case of company+topic (e.g. `sea_brazil_verification`)
    - `task_description` → constructed prompt above
 
@@ -80,7 +80,7 @@ $env:JINA_API_KEY = "YOUR_JINA_API_KEY"
 $env:SUMMARY_LLM_API_KEY = "YOUR_GEMINI_API_KEY"
 $env:SUMMARY_LLM_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
 $env:SUMMARY_LLM_MODEL_NAME = "gemini-3-flash-preview"
-cd "C:\Users\pwlba\MiroThinker\apps\miroflow-agent"
+cd "[your-path]/MiroThinker\apps\miroflow-agent"
 uv run python main.py llm=gemini agent=no_e2b
 ```
 
@@ -92,9 +92,10 @@ uv run python main.py llm=gemini agent=no_e2b
 
 ## Config reference
 
-- MiroThinker: `C:\Users\pwlba\MiroThinker\apps\miroflow-agent\`
+- MiroThinker: `[your-path]/MiroThinker\apps\miroflow-agent\`
 - task_description line: ~32 in main.py
-- LLM: gemini-2.5-flash
+- LLM: gemini-3-flash-preview
 - Agent config: no_e2b (Google Search + Jina, no code sandbox)
 - Cost: ~$0.05–0.10 per question
 - Time: 3–6 minutes
+
