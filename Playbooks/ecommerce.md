@@ -1,7 +1,5 @@
 # E-commerce Playbook
 
-*Sources: Drew Cohen (Consumer Hierarchy of Preferences), Shopee/TikTok Shop analysis*
-
 ## Key sector metrics
 
 - **GMV** (Gross Merchandise Value) — total transaction volume on the platform
@@ -13,7 +11,7 @@
 - **Return rates** — TikTok Shop: 15-20% vs Shopee: 5-8%; high return rate = poor transaction quality
 - **Adjusted EBITDA** — is the platform profitable without subsidies?
 
-## Drew Cohen — Consumer Hierarchy of Preferences
+## Signals of healthy vs unhealthy growth
 
 Signals of healthy e-commerce:
 - Revenue growth > User/Order growth → monetization is growing ✅

@@ -1,5 +1,5 @@
-# Analizy konkretnych spółek — nie wrzucamy
-Analizy/*/
+# Per-company analyses — keep out of version control
+Analyses/*/
 
 # System
 .DS_Store

@@ -72,17 +72,23 @@ Sector-specific guides loaded at the start of analysis when a matching sector is
 ```
 4. Create your analysis folder structure:
 ```
-your-folder/
-├── Analizy/
-│   ├── Playbooks/    ← sector playbooks go here
-│   └── [Company]/    ← per-company analysis files (keep out of version control)
+Stock Research/
+├── analyze-stock.md
+├── stock-research.md
+├── Playbooks/          ← sector playbooks
+│   └── ecommerce.md
+├── Analyses/           ← per-company files (excluded from version control)
+│   └── [Company]/
+│       ├── notes.md
+│       └── CLAUDE.md
+└── .gitignore
 ```
 
 ## Output
 
 Each analysis session produces:
-- `Analizy/[Company]/notes.md` — accumulated findings per filar
-- `Analizy/[Company]/CLAUDE.md` — session state (current phase, Lynch label, active filar) so analysis can be resumed in future sessions
+- `Analyses/[Company]/notes.md` — accumulated findings per pillar
+- `Analyses/[Company]/CLAUDE.md` — session state (current phase, Lynch label, active pillar) so analysis can be resumed in future sessions
 
 ## Tools used
 
