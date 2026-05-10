@@ -9,6 +9,8 @@ description: Use when user wants to analyze a stock or company for investment pu
 
 Structured 8-step investment analysis. User drives pace — work in small steps, await approval before moving to next. Generate questions dynamically from principles, never from a closed list. Cite sources with specific article links, not domains.
 
+**Default: always verify time-sensitive facts via WebSearch.** Training data has a cutoff — company leadership, recent results, market share, guidance, and competitive dynamics must be checked against current sources. When in doubt, search first, answer second.
+
 ## Invocation
 
 ```
