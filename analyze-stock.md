@@ -97,7 +97,7 @@ Check `[your-folder]/Analyses/Playbooks/[sector].md` at start. If missing: resea
 
 ## Update Mode
 
-Triggered when user says "update [Company]", "new results", "aktualizujemy", or invokes `/analyze-stock [Company] update`.
+Triggered when user says "update [Company]", "new results", or invokes `/analyze-stock [Company] update`.
 
 **Step 1 — Load context**
 Read `Analyses/[Company]/CLAUDE.md` and `notes.md`. Briefly summarize: current phase, Lynch label, original investment thesis, last valuation.
