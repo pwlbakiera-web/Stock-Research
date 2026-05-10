@@ -9,7 +9,6 @@ description: Use when user wants to analyze a stock or company for investment pu
 
 Structured 8-step investment analysis. User drives pace — work in small steps, await approval before moving to next. Generate questions dynamically from principles, never from a closed list. Cite sources with specific article links, not domains.
 
-**Full framework details:** `C:\Users\pwlba\AI design\docs\2026-05-09-analyze-stock-design.md`
 
 ## Invocation
 
