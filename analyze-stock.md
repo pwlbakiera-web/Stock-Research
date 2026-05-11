@@ -65,11 +65,48 @@ Output: Phase per segment + composite, Lynch modifier if applicable, valuation m
 
 **Pillar 5 Growth Potential:** TAM/SAM + penetration → growth levers: new customers / more from existing / geography / new products / pricing power / M&A → S&M as % revenue → backlog (product ≠ service) → catalysts.
 
-**Pillar 6 Outlook:** Management guidance (NotebookLM) → execution vs promises → analyst consensus vs guidance → red flags in communication (metric changes, vague language, recurring "transitional factors", guidance revision after Investor Day).
+**Pillar 6 Outlook:** Management guidance → execution vs promises → analyst consensus vs guidance → red flags in communication (metric changes, vague language, recurring "transitional factors", guidance revision after Investor Day) → transcript deep-dive (see Transcript Analysis section below).
 
 **Pillar 7 Valuation:** Primary metric from phase + secondary complementary metrics → Reverse DCF (data from user's Google Sheet, WACC and terminal growth rate per company) → SBC-adjusted FCF for FCF-based methods → Bull/Base/Bear (assumptions emerge from previous pillars, set case by case).
 
 **Pillar 8 Sentiment + Management:** Sentiment: bulls vs bears / analyst consensus + revision direction / insider trading / short interest / momentum vs sector. Management: track record / execution vs promises (pattern) / SBC as % FCF / employee sentiment / skin in the game.
+
+## Transcript Analysis
+
+Used in Pillar 6 and Pillar 8. Run whenever an earnings call transcript is relevant.
+
+### Step 0 — Source question (always ask first)
+
+Before starting, ask:
+> "Czy mam pobrać transkrypt sam (WebSearch), czy sam go dostarczysz?"
+
+- **Search** → use WebSearch to find the latest transcript (Motley Fool, Seeking Alpha, AlphaStreet, Yahoo Finance). Fetch full Q&A, not just summary.
+- **User provides** → paste or link; read in full before analysis.
+
+### Step 1 — Six lenses to apply
+
+**1. Hedging language**
+Look for: qualifiers ("early-stage", "extremely dynamic", "it is early in the quarter"), passive constructions, repeated reassurances, phrases that walk back positive numbers.
+
+**2. Deflected / unanswered questions**
+For each analyst question: did management answer directly or pivot? Log every pivot. Short answers to big questions = signal.
+
+**3. Changes in language vs. prior quarter**
+Compare framing of key topics (guidance language, product names, market size claims). New buzzwords introduced = narrative shift. Dropped topics = something went wrong.
+
+**4. What was NOT said**
+Checklist of things that *should* have been said given the results: long-term margin targets, FY+1 guidance, competitive response, customer names (when concentration is high), renewal terms.
+
+**5. Signals hidden in positive narrative**
+Read each superlative claim and ask: what does this imply about the downside? ("customers understand their businesses" = we're dependent on their forecasts.) Check math behind headline numbers for coverage gaps.
+
+**6. Unexpected risk admissions**
+Flag any phrase where management admits a weakness, past skepticism, structural uncertainty, or near-term headwind — even if buried mid-answer.
+
+### Step 2 — Output format
+
+For each lens: list findings as bullets with exact quote → interpretation → severity (Low / Medium / High).
+Close with a one-paragraph verdict: what the transcript confirms, what it leaves unresolved, and the single biggest question management avoided.
 
 ## Summary per pillar
 
@@ -81,7 +118,7 @@ At the end of each pillar: short qualitative summary — what's strong, what rai
 |---|---|
 | WebSearch | Classification, Pillar 1, quick facts — link to specific article |
 | fiscal.ai | Precise financial data (user provides) |
-| NotebookLM | Earnings calls, management comments (Pillar 6) |
+| NotebookLM | Earnings calls, management comments (Pillar 6) — optional, see Transcript Analysis |
 | Google Sheet | Reverse DCF inputs (user provides) |
 | MiroThinker | Deep research or parallel worker — `/stock-research` |
 | Google Drive MCP | Read/write analysis files |
