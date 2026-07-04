@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>autonomous-analysis — how it works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c0e11;
+    --ink-2:#13161b;
+    --surface:#171b21;
+    --surface-2:#1d222a;
+    --line:rgba(224,163,74,.14);
+    --line-soft:rgba(232,230,224,.08);
+    --text:#e9e6df;
+    --muted:#9aa0ab;
+    --muted-2:#6b7280;
+    --amber:#e6a94d;
+    --amber-bright:#f4c277;
+    --green:#6cc08a;
+    --grey:#5d6470;
+    --red:#d9776a;
+    --serif:'Fraunces',Georgia,serif;
+    --sans:'IBM Plex Sans',-apple-system,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:var(--sans);
+    font-weight:300;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(1200px 600px at 80% -10%, rgba(230,169,77,.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 20%, rgba(108,192,138,.05), transparent 55%);
+    background-attachment:fixed;
+  }
+  /* grain overlay */
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+  /* ---- header ---- */
+  header{padding:84px 0 48px;border-bottom:1px solid var(--line)}
+  .kicker{
+    font-family:var(--mono);font-size:12px;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--amber);font-weight:500;display:flex;align-items:center;gap:14px;
+  }
+  .kicker::before{content:"";width:42px;height:1px;background:var(--amber);display:inline-block}
+  h1{
+    font-family:var(--serif);font-weight:900;font-size:clamp(40px,7vw,82px);
+    line-height:.98;letter-spacing:-.02em;margin:22px 0 8px;
+  }
+  h1 em{font-style:italic;font-weight:400;color:var(--amber-bright)}
+  .lede{font-size:clamp(17px,2.2vw,21px);color:var(--muted);max-width:680px;font-weight:300;margin-top:18px}
+  .lede b{color:var(--text);font-weight:500}
+  .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+  .pill{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:7px 13px;border-radius:999px;
+    border:1px solid var(--line-soft);color:var(--muted);background:rgba(255,255,255,.015);
+  }
+  .pill b{color:var(--text);font-weight:600}
+
+  /* ---- section scaffolding ---- */
+  section{padding:64px 0;border-bottom:1px solid var(--line-soft)}
+  .sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:34px}
+  .sec-num{font-family:var(--mono);font-size:13px;color:var(--amber);font-weight:500}
+  h2{font-family:var(--serif);font-weight:500;font-size:clamp(26px,4vw,40px);letter-spacing:-.01em;line-height:1.05}
+  .sec-sub{color:var(--muted);max-width:640px;margin-top:10px;font-size:16px}
+
+  /* ---- analogy callout ---- */
+  .analogy{
+    background:linear-gradient(135deg,var(--surface),var(--ink-2));
+    border:1px solid var(--line);border-left:3px solid var(--amber);
+    border-radius:14px;padding:30px 34px;font-size:18px;line-height:1.7;color:#d7d3ca;
+  }
+  .analogy b{color:var(--amber-bright);font-weight:500}
+  .analogy .role{font-family:var(--mono);font-size:.82em;color:var(--text);background:rgba(230,169,77,.1);padding:2px 7px;border-radius:5px;font-weight:500}
+
+  /* ---- pipeline graph ---- */
+  .flow{position:relative;margin-top:8px}
+  .spine{position:absolute;left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%);
+    background:linear-gradient(var(--amber),rgba(230,169,77,.15));z-index:0}
+  .stage{position:relative;z-index:1;margin:0 auto 26px;max-width:760px}
+  .node{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px 26px;
+    box-shadow:0 18px 40px -28px rgba(0,0,0,.9);position:relative;
+  }
+  .node::before{ /* connector dot */
+    content:"";position:absolute;top:-15px;left:50%;transform:translateX(-50%);
+    width:11px;height:11px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 5px var(--ink),0 0 14px rgba(230,169,77,.7);
+  }
+  .stage:first-child .node::before{display:none}
+  .node-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .tag{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--ink);
+    background:var(--amber);padding:3px 9px;border-radius:6px}
+  .node h3{font-family:var(--serif);font-weight:500;font-size:23px;letter-spacing:-.01em}
+  .node .what{color:var(--muted);font-size:15.5px;margin-top:8px}
+  .node .what b{color:var(--text);font-weight:500}
+  .badges{display:flex;gap:7px;margin-left:auto}
+  .b{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;padding:3px 8px;border-radius:5px;font-weight:500;white-space:nowrap}
+  .b.opus{background:rgba(230,169,77,.14);color:var(--amber-bright);border:1px solid rgba(230,169,77,.3)}
+  .b.sonnet{background:rgba(120,160,220,.13);color:#9cc0f0;border:1px solid rgba(120,160,220,.28)}
+  .b.py{background:rgba(108,192,138,.13);color:var(--green);border:1px solid rgba(108,192,138,.28)}
+  .b.done{background:rgba(108,192,138,.16);color:var(--green);border:1px solid rgba(108,192,138,.35)}
+  .b.wip{background:rgba(230,169,77,.16);color:var(--amber-bright);border:1px solid rgba(230,169,77,.38)}
+  .b.spec{background:rgba(140,170,255,.13);color:#a8baf2;border:1px solid rgba(140,170,255,.34)}
+  .b.todo{background:rgba(120,130,145,.12);color:#9aa0ab;border:1px solid rgba(120,130,145,.28)}
+
+  /* sub-grid inside nodes */
+  .sub{margin-top:18px;display:grid;gap:10px}
+  .sub.cols-2{grid-template-columns:1fr 1fr}
+  .sub.cols-3{grid-template-columns:repeat(3,1fr)}
+  .chip{
+    background:var(--surface-2);border:1px solid var(--line-soft);border-radius:10px;padding:13px 15px;
+  }
+  .chip .ct{font-family:var(--mono);font-size:11.5px;color:var(--amber);font-weight:600;letter-spacing:.03em;display:block;margin-bottom:3px}
+  .chip .cd{font-size:13.5px;color:var(--muted);line-height:1.5}
+  .chip .cd b{color:var(--text);font-weight:500}
+  .note{font-size:13px;color:var(--muted-2);margin-top:14px;font-family:var(--mono);letter-spacing:.02em}
+  .loop-badge{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--amber-bright);
+    border:1px dashed rgba(230,169,77,.4);border-radius:8px;padding:6px 11px;margin-top:14px}
+
+  .arrow-label{text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--muted-2);margin:-12px 0 14px;position:relative;z-index:2}
+
+  /* ---- explainer cards ---- */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;padding:24px 26px;transition:border-color .3s,transform .3s}
+  .card:hover{border-color:var(--line);transform:translateY(-3px)}
+  .card .ch{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+  .card .ic{font-family:var(--serif);font-weight:900;font-size:20px;color:var(--amber);width:38px;height:38px;
+    display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:var(--ink-2)}
+  .card h4{font-family:var(--serif);font-weight:500;font-size:19px}
+  .card .sub-t{font-family:var(--mono);font-size:11px;color:var(--muted-2);letter-spacing:.05em}
+  .card p{font-size:15px;color:var(--muted);line-height:1.65}
+  .card p b{color:var(--text);font-weight:500}
+
+  /* ---- rules ---- */
+  .rules{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .rule{display:flex;gap:15px;background:var(--ink-2);border:1px solid var(--line-soft);border-radius:12px;padding:20px 22px}
+  .rule .rn{font-family:var(--mono);font-size:13px;color:var(--amber);font-weight:600;flex-shrink:0;padding-top:2px}
+  .rule h5{font-size:15.5px;font-weight:600;color:var(--text);margin-bottom:4px}
+  .rule p{font-size:14px;color:var(--muted);line-height:1.55}
+  .gates{margin-top:18px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  .gate{background:var(--surface);border:1px solid var(--line-soft);border-radius:10px;padding:14px;text-align:center}
+  .gate .gn{font-family:var(--mono);font-size:22px;color:var(--amber);font-weight:600;display:block}
+  .gate .gt{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+
+  /* ---- status strip ---- */
+  .status-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:6px}
+  .st{border:1px solid var(--line-soft);border-radius:12px;padding:20px;background:var(--ink-2)}
+  .st .sm{font-family:var(--mono);font-size:12px;color:var(--muted-2);letter-spacing:.08em}
+  .st .sl{font-family:var(--serif);font-size:21px;font-weight:500;margin:6px 0 10px}
+  .st .ss{font-family:var(--mono);font-size:12.5px;font-weight:600}
+  .st.done{border-color:rgba(108,192,138,.3)} .st.done .ss{color:var(--green)}
+  .st.wip{border-color:rgba(230,169,77,.35)} .st.wip .ss{color:var(--amber-bright)}
+  .st.spec{border-color:rgba(140,170,255,.34)} .st.spec .ss{color:#a8baf2}
+  .st.todo .ss{color:var(--muted)}
+  .next{margin-top:26px;font-family:var(--mono);font-size:14px;color:var(--muted);
+    border-left:2px solid var(--amber);padding:10px 0 10px 18px}
+  .next b{color:var(--amber-bright)}
+
+  footer{padding:50px 0 80px;color:var(--muted-2);font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+
+  /* reveal animation */
+  .rv{opacity:0;transform:translateY(18px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  @media(max-width:720px){
+    .cards,.rules,.sub.cols-2,.sub.cols-3,.status-strip{grid-template-columns:1fr}
+    .gates{grid-template-columns:repeat(2,1fr)}
+    .badges{margin-left:0;width:100%}
+    .spine{left:20px} .node::before{left:-26px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker rv">equity research · tool</div>
+    <h1 class="rv" style="animation-delay:.05s">autonomous&#8209;<em>analysis</em></h1>
+    <p class="lede rv" style="animation-delay:.12s">
+      From a single <b>ticker</b> the machine produces a full, analyst-grade
+      investment report on its own &ndash; it gathers data, values the company, writes a thesis,
+      attacks it and tempers it. <b>No human in the loop.</b>
+    </p>
+    <div class="meta-row rv" style="animation-delay:.2s">
+      <span class="pill"><b>Input:</b> ticker</span>
+      <span class="pill"><b>Output:</b> report + verdict BUY / WAIT / PASS</span>
+      <span class="pill">4 modules: <b>M3 · M1 · M2 · M4</b></span>
+      <span class="pill">valuation engine: <b>pure Python</b></span>
+    </div>
+  </div>
+</header>
+
+<!-- 1. WHAT IT IS -->
+<section>
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">01</span>
+      <div><h2>What it actually is</h2></div>
+    </div>
+    <div class="analogy rv">
+      Picture a <b>fund team or a newsroom</b>. You throw in a company name and do nothing else.
+      The machine, on its own: sends <span class="role">reporters</span> out for the facts, has an
+      <span class="role">accountant</span> compute what the company is worth, an
+      <span class="role">editor</span> write the piece with a verdict, and then a
+      <span class="role">devil's advocate</span> tries to tear that piece apart. At the end the editor
+      returns and <b>tempers</b> the thesis under fire &ndash; so that only the one that survived the
+      attack reaches you. The result: a finished report with a clear "buy / wait / pass" and the risks
+      spelled out.
+    </div>
+  </div>
+</section>
+
+<!-- 2. PIPELINE -->
+<section>
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">02</span>
+      <div>
+        <h2>How the analysis flows</h2>
+        <p class="sec-sub">A production line for analysis &ndash; from ticker to finished report, in 6 stages. Each block takes the previous one's output. Badges on the right: who computes (model) and status (<span style="color:var(--green)">✓ done</span>).</p>
+      </div>
+    </div>
+
+    <div class="flow">
+      <div class="spine"></div>
+
+      <!-- INPUT -->
+      <div class="stage rv">
+        <div class="node">
+          <div class="node-top">
+            <span class="tag">START</span>
+            <h3>Ticker + date</h3>
+          </div>
+          <p class="what">You give only the company symbol and a cutoff date. The rest happens on its own.</p>
+        </div>
+      </div>
+      <div class="arrow-label">▼ the symbol goes to ingest</div>
+
+      <!-- M3 -->
+      <div class="stage rv">
+        <div class="node">
+          <div class="node-top">
+            <span class="tag">M3 · step 1</span>
+            <h3>Ingest &ndash; gathering the raw material</h3>
+            <div class="badges"><span class="b done">✓ done</span></div>
+          </div>
+          <p class="what">First a <b>fact-checker</b> acquires the hard data, then <b>6 reporters</b> in parallel study the company from 6 angles.</p>
+          <div class="sub">
+            <div class="chip">
+              <span class="ct">S0 &middot; data-pack <span class="b opus" style="margin-left:6px">opus</span></span>
+              <span class="cd">Goes <b>first and alone</b>. Collects numbers (price, debt, FCF, revenue), sources, and sets the <b>market regime</b> (cycle or durable growth). Everything else stands on this data.</span>
+            </div>
+          </div>
+          <div class="sub cols-3">
+            <div class="chip"><span class="ct">S1</span><span class="cd">business + technology, explained <b>in plain terms</b></span></div>
+            <div class="chip"><span class="ct">S2</span><span class="cd">competitive advantage (moat) and its <b>direction</b></span></div>
+            <div class="chip"><span class="ct">S3</span><span class="cd">risks and <b>thesis-breakers</b></span></div>
+            <div class="chip"><span class="ct">S4</span><span class="cd">growth, market size (TAM), levers</span></div>
+            <div class="chip"><span class="ct">S5</span><span class="cd">outlook + guidance, market forecasts, <b>everything that reinforces and breaks the thesis</b> (new markets, threats) + narrative evolution</span></div>
+            <div class="chip"><span class="ct">S6</span><span class="cd">sentiment, insiders, management</span></div>
+          </div>
+          <p class="note">S1&ndash;S6 = <span class="b sonnet" style="vertical-align:middle">sonnet</span> &nbsp;·&nbsp; they run at once (parallel), each with a narrow brief</p>
+        </div>
+      </div>
+      <div class="arrow-label">▼ the hard numbers (S0) go to valuation</div>
+
+      <!-- M1 -->
+      <div class="stage rv">
+        <div class="node">
+          <div class="node-top">
+            <span class="tag">M1 · step 2</span>
+            <h3>Valuation &ndash; the calculator</h3>
+            <div class="badges"><span class="b py">python</span><span class="b done">✓ done</span></div>
+          </div>
+          <p class="what"><b>Zero AI, pure math</b> &ndash; the same data always gives the same result, no number can be "invented". It computes what the company is worth, in one of two modes:</p>
+          <div class="sub cols-2">
+            <div class="chip">
+              <span class="ct">mode A &middot; reverse-DCF</span>
+              <span class="cd">The company <b>earns</b>. It asks: what growth is the market already pricing in, and what is real? The gap = the opportunity.</span>
+            </div>
+            <div class="chip">
+              <span class="ct">mode B &middot; pre-profit / Fermi</span>
+              <span class="cd">The company <b>does not earn yet</b> (e.g. a crypto miner). Valued via mature margin, power (MW), ARR.</span>
+            </div>
+          </div>
+          <p class="note">output: a scenario fan (bear / base / bull) + value per share + a scale sanity-check</p>
+        </div>
+      </div>
+      <div class="arrow-label">▼ numbers + research go to the editor</div>
+
+      <!-- M4 SYNTHESIS -->
+      <div class="stage rv">
+        <div class="node">
+          <div class="node-top">
+            <span class="tag">M4 · step 3</span>
+            <h3>Synthesis &ndash; the editor writes the thesis</h3>
+            <div class="badges"><span class="b opus">opus</span><span class="b done">✓ done</span></div>
+          </div>
+          <p class="what">The heart of M4. <b>One editor</b> takes EVERYTHING at once (data + valuation + 6 streams) and writes a coherent "doctrine verdict": a thesis, a recommendation (<b>BUY / WAIT / PASS</b> + conviction) and the same <b>10 fields</b>. One brain = no internal contradictions.</p>
+          <div class="sub cols-3">
+            <div class="chip"><span class="ct">1 · edge</span><span class="cd">what the market models wrong</span></div>
+            <div class="chip"><span class="ct">2 · state of knowledge</span><span class="cd">what's certain, what's a guess</span></div>
+            <div class="chip"><span class="ct">3 · hypothesis</span><span class="cd">what must be true</span></div>
+            <div class="chip"><span class="ct">5 · implied vs actual</span><span class="cd">valuation vs reality</span></div>
+            <div class="chip"><span class="ct">6 · asymmetry</span><span class="cd">upside vs downside</span></div>
+            <div class="chip"><span class="ct">8 · recommendation</span><span class="cd">tranches / wait</span></div>
+          </div>
+          <p class="note">+ fields 4 (outside view), 7 (thesis-breakers), 9 (take-profit), 10 (frozen expectation)</p>
+        </div>
+      </div>
+      <div class="arrow-label">▼ the finished draft goes to the firing squad</div>
+
+      <!-- M2 ATTACK -->
+      <div class="stage rv">
+        <div class="node">
+          <div class="node-top">
+            <span class="tag">M2 · step 4</span>
+            <h3>Adversarial attack &ndash; the devil's advocate</h3>
+            <div class="badges"><span class="b opus">3× opus</span><span class="b done">✓ done</span></div>
+          </div>
+          <p class="what"><b>Three</b> devil's advocates attack the draft <b>symmetrically</b>: one tears the bull thesis apart, another the bear thesis, the third audits the doctrine gates. It repeats until there are no new charges &ndash; only a thesis that survived the barrage reaches you.</p>
+          <div class="sub cols-3">
+            <div class="chip"><span class="ct">attack the bull</span><span class="cd">mandate: <b>tear apart</b> the long thesis</span></div>
+            <div class="chip"><span class="ct">attack the bear</span><span class="cd">mandate: <b>tear apart</b> the "wait / it will fall" thesis</span></div>
+            <div class="chip"><span class="ct">gate audit 1&ndash;5</span><span class="cd">did the run break the rules?</span></div>
+          </div>
+          <div class="loop-badge">⟳ loop-until-dry &middot; repeat rounds until 0 new charges, max 3</div>
+          <p class="note">returns a <b>list of holes</b> (findings), does not rewrite the report &ndash; the revision does that. Unresolved ones → explicitly flagged in the report.</p>
+        </div>
+      </div>
+      <div class="arrow-label">▼ the holes + draft go back to the editor</div>
+
+      <!-- M4 REVISION -->
+      <div class="stage rv">
+        <div class="node">
+          <div class="node-top">
+            <span class="tag">M4 · step 5</span>
+            <h3>Revision &ndash; tempering the thesis</h3>
+            <div class="badges"><span class="b opus">opus</span><span class="b done">✓ done</span></div>
+          </div>
+          <p class="what">The editor takes the draft + the charges from the attack and writes the <b>FINAL REPORT</b>. It does not apply the criticism blindly &ndash; it weighs each one.</p>
+          <div class="sub cols-3">
+            <div class="chip"><span class="ct">folds in</span><span class="cd">fixes where the charge is <b>valid</b></span></div>
+            <div class="chip"><span class="ct">defends</span><span class="cd">refutes with <b>evidence</b> where the charge is wrong</span></div>
+            <div class="chip"><span class="ct">resolves</span><span class="cd">reconciles contradictions (e.g. a verdict divergence)</span></div>
+          </div>
+          <p class="note">what cannot be resolved → lands as an <b>explicit flag</b> in the "open risks" section. The verdict can change if the attack landed.</p>
+        </div>
+      </div>
+      <div class="arrow-label">▼ the finished report goes to be saved</div>
+
+      <!-- SAVE -->
+      <div class="stage rv">
+        <div class="node">
+          <div class="node-top">
+            <span class="tag">M4 · step 6</span>
+            <h3>Save &ndash; to the archive</h3>
+            <div class="badges"><span class="b done">✓ done</span></div>
+          </div>
+          <p class="what">The finished <b>report</b>, the data pack and the <b>verdict card</b> land in the company's archive (your research vault) &ndash; as a durable record you can return to.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 3. WHO'S WHO -->
+<section>
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">03</span>
+      <div>
+        <h2>Who's who (in plain terms)</h2>
+        <p class="sec-sub">The same modules, described by team roles.</p>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="card rv">
+        <div class="ch"><div class="ic">R</div><div><h4>Reporters &ndash; M3 / S1-S6</h4><span class="sub-t">sonnet · 6 in parallel</span></div></div>
+        <p>Each digs into one topic: how the business works, whether it has a moat, what can go wrong, where growth comes from, how management shifted its tone, what others feel. <b>Fast and narrow.</b></p>
+      </div>
+      <div class="card rv" style="animation-delay:.05s">
+        <div class="ch"><div class="ic">F</div><div><h4>Fact-checker &ndash; M3 / S0</h4><span class="sub-t">opus · goes first</span></div></div>
+        <p>Acquires the hard numbers and sources. If something is missing &ndash; it <b>marks "est." and lowers confidence</b>, never invents. The whole rest stands on its data (the GIGO rule).</p>
+      </div>
+      <div class="card rv" style="animation-delay:.1s">
+        <div class="ch"><div class="ic">A</div><div><h4>Accountant &ndash; M1</h4><span class="sub-t">Python · zero AI</span></div></div>
+        <p>A pure calculator. Takes the numbers from the fact-checker and computes the company's value &ndash; in a mode for earners or for not-yet-earners. <b>Deterministic: always the same result.</b></p>
+      </div>
+      <div class="card rv" style="animation-delay:.15s">
+        <div class="ch"><div class="ic">D</div><div><h4>Devil's advocate &ndash; M2</h4><span class="sub-t">3× opus · loops to exhaustion</span></div></div>
+        <p>The most important quality filter. Three at once attack the finished thesis <b>evenly from both sides</b> and enforce the 5 doctrine gates. Only what survives the barrage reaches you.</p>
+      </div>
+      <div class="card rv" style="animation-delay:.2s">
+        <div class="ch"><div class="ic">E</div><div><h4>Editor &ndash; M4 synthesis + revision</h4><span class="sub-t">opus · one brain</span></div></div>
+        <p>Writes the thesis from the whole material, and after the attack assembles the <b>final report</b>: folds in valid fixes, defends with evidence where a charge is wrong, and <b>explicitly flags</b> doubts it cannot resolve. One mind = a coherent verdict.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. TWO M4 PRINCIPLES -->
+<section>
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">04</span>
+      <div>
+        <h2>The two principles M4 stands on</h2>
+        <p class="sec-sub">Why the synthesis and the attack are ordered exactly this way &ndash; and not otherwise.</p>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="card rv">
+        <div class="ch"><div class="ic">1</div><div><h4>One brain for synthesis</h4><span class="sub-t">consistency above all</span></div></div>
+        <p>The thesis is written by <b>one editor (opus)</b>, not a team split across 10 fields. Reason: the verdict must be internally consistent &ndash; <b>the verdict card cannot say something different from the reasoning</b>. And that can only be guaranteed when one mind sees the whole thing at once (data, valuation, all 6 streams). Split the work &ndash; you get contradictions at the seams.</p>
+      </div>
+      <div class="card rv" style="animation-delay:.06s">
+        <div class="ch"><div class="ic">2</div><div><h4>Build first, then attack</h4><span class="sub-t">build → red-team → temper</span></div></div>
+        <p>Synthesis <b>builds</b> the thesis, the devil's advocate (M2) <b>fires at it</b>, the revision <b>tempers</b> it. That is exactly what a good investment process looks like: build a thesis, red-team it, only then act. The order is not accidental &ndash; you cannot solidly attack something that does not exist yet, and a thesis that has not passed the attack should not reach a decision.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. RULES -->
+<section>
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">05</span>
+      <div>
+        <h2>Why you can trust the result</h2>
+        <p class="sec-sub">Four rules built into the machine &ndash; they keep it from lying and from faking precision.</p>
+      </div>
+    </div>
+    <div class="rules">
+      <div class="rule rv"><span class="rn">A</span><div><h5>GIGO &ndash; garbage in, garbage out</h5><p>Without trusted data we compute nothing. No number → an "est." flag, never an invention. That is why the fact-checker goes first.</p></div></div>
+      <div class="rule rv" style="animation-delay:.05s"><span class="rn">B</span><div><h5>The false-precision tax</h5><p>Every figure from a 5+ year horizon gets a <b>†</b> marker &ndash; it is a scenario artifact, not a forecast. We do not pretend to know the year 2031.</p></div></div>
+      <div class="rule rv" style="animation-delay:.1s"><span class="rn">C</span><div><h5>Symmetric attack</h5><p>The devil's advocate hits the bull and the bear <b>evenly</b>. There is no cheering for the thesis &ndash; the thesis must defend itself.</p></div></div>
+      <div class="rule rv" style="animation-delay:.15s"><span class="rn">D</span><div><h5>Model map</h5><p>Reasoning and data integrity = <b>Opus</b>. Research = <b>Sonnet</b>. Numbers = <b>Python</b>. Each does what it is best at.</p></div></div>
+    </div>
+
+    <p class="note" style="margin-top:30px">The 5 gates the devil's advocate enforces (M2):</p>
+    <div class="gates">
+      <div class="gate rv"><span class="gn">1</span><span class="gt">Market regime named explicitly?</span></div>
+      <div class="gate rv" style="animation-delay:.04s"><span class="gn">2</span><span class="gt">Mid-cycle not from a reflex?</span></div>
+      <div class="gate rv" style="animation-delay:.08s"><span class="gn">3</span><span class="gt">Tail a distribution, not a pretext to "wait"?</span></div>
+      <div class="gate rv" style="animation-delay:.12s"><span class="gn">4</span><span class="gt">Verdict actionable by default?</span></div>
+      <div class="gate rv" style="animation-delay:.16s"><span class="gn">5</span><span class="gt">Edge (the gap) named?</span></div>
+    </div>
+
+    <div class="analogy rv" style="margin-top:34px">
+      <b>Refinement (gate 2): cycle normalization is now per-segment.</b><br>
+      The machine used to look at a company in a binary way: either "normalize to mid-cycle" or not. That is too coarse.
+      Many companies are a mix &ndash; part driven by a structural boom (e.g. AI datacenter demand)
+      and part ordinary cyclical industry. Now each piece is treated separately:
+      <span class="role">the structural-growth segment</span> &ndash; <b>no</b> mid-cycle normalization; assume the cycle continues,
+      and ask only how much the market already prices in (the implied-vs-actual gap) plus a scale sanity-check.
+      <span class="role">the cyclical segment</span> &ndash; cycle normalization allowed, as before.
+      Treating such a hybrid as binary distorts the valuation &ndash; so the machine weights the decision by segment share.
+    </div>
+  </div>
+</section>
+
+<!-- 6. STATUS -->
+<section style="border-bottom:none">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">06</span>
+      <div><h2>Where things stand</h2></div>
+    </div>
+    <div class="status-strip">
+      <div class="st done rv"><div class="sm">M3 INGEST</div><div class="sl">Data gathering</div><div class="ss">✓ done + validated</div></div>
+      <div class="st done rv" style="animation-delay:.05s"><div class="sm">M1 VALUATION</div><div class="sl">Python engine</div><div class="ss">✓ done + validated</div></div>
+      <div class="st done rv" style="animation-delay:.1s"><div class="sm">M2 ADVERSARY</div><div class="sl">Adversarial attack</div><div class="ss">✓ done + validated</div></div>
+      <div class="st done rv" style="animation-delay:.15s"><div class="sm">M4 ASSEMBLY</div><div class="sl">Synthesis + revision</div><div class="ss">✓ done</div></div>
+    </div>
+    <p class="note" style="margin-top:18px">All four modules are implemented. The valuation engine and the structural validators are deterministic, standalone Python; the LLM stages (S0-S6, synthesis, M2, revision, editorial) run inside a Workflow orchestrator.</p>
+    <p class="next rv">Run it with <b>autonomous-analysis.mjs</b> (mode=full) on any ticker. See the module READMEs for the I/O contracts, test seams and cost profile.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    autonomous-analysis · a self-contained, autonomous equity-research orchestrator.
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Secrets / local config
+.env
+*.local
+
+# Run outputs (ticker analyses / temp) - keep the empty dirs, ignore the contents
+m2/_runs/*
+m3/_runs/*
+m4/_runs/*
+!m2/_runs/.gitkeep
+!m3/_runs/.gitkeep
+!m4/_runs/.gitkeep
+
+# Node
+node_modules/
+
+# OS
+Thumbs.db
+.DS_Store
